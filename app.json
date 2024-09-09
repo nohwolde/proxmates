@@ -6,7 +6,7 @@
 		"orientation": "default",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "dark",
-		"scheme": "music-player",
+		"scheme": "proxmate",
 		"splash": {
 			"image": "./assets/icon.png",
 			"resizeMode": "contain",

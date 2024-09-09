@@ -32,7 +32,7 @@ const defineConfig = (): ExpoConfig => ({
 	},
 	extra: {
 		eas: {
-			projectId: 'dc912c96-9df5-4bfc-9b7b-bb131f79a4bd',
+			projectId: '0f7def55-a553-4a4d-a492-2646515d2697',
 		},
 	},
 	plugins: [
