@@ -3,8 +3,6 @@ import { Session } from '@supabase/supabase-js'
 import { useEffect } from 'react'
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-import useProfileStore from '@/store/profile'
-
 import { initiateAppleSignIn } from '@/helpers/auth'
 import { AntDesign } from '@expo/vector-icons'
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react'
@@ -12,30 +10,13 @@ import { useState } from 'react'
 import { Alert, Pressable, TextInput } from 'react-native'
 
 import GoogleAuth from '@/components/GoogleAuth'
-import ProfilesList from '@/components/ProfilesList'
 import { screenPadding } from '@/constants/tokens'
 import { Icon } from '@rneui/themed'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import { useRouter } from 'expo-router'
-import FastImage from 'react-native-fast-image'
 
 export default function Profile() {
 	const user = useUser()
-
-	const {
-		spotProfile,
-		setSpotProfile,
-		spotPlaylists,
-		setSpotPlaylists,
-		addSpotPlaylist,
-		updateSpotPlaylist,
-		setYtPlaylists,
-		updateYtPlaylist,
-		setYtProfile,
-		updateScPlaylist,
-		setScPlaylists,
-		setScProfile,
-	} = useProfileStore()
 
 	const [session, setSession] = useState<Session | null>(null)
 
@@ -50,134 +31,6 @@ export default function Profile() {
 			setSession(session)
 		})
 	}, [])
-
-	useEffect(() => {
-		if (session) {
-			// get all profiles for this user
-
-			const fetchProfiles = async () => {
-				const { data: profiles, error } = await supabase
-					.from('profiles')
-					.select('*')
-					.eq('user_id', session?.user?.id)
-
-				if (error) {
-					console.error('Error getting profiles:', error)
-					return
-				} else {
-					console.log('Profiles', profiles)
-					// set all profiles based on platform
-
-					profiles.map((prof: any) => {
-						if (prof.platform === 'Soundcloud') {
-							setScProfile(prof)
-						} else if (prof.platform === 'Youtube') {
-							setYtProfile(prof)
-						} else if (prof.platform === 'Spotify') {
-							setSpotProfile(prof)
-						}
-					})
-				}
-
-				console.log('Profiles', profiles)
-			}
-
-			fetchProfiles()
-		}
-	}, [session])
-
-	useEffect(() => {
-		console.log(session)
-
-		const fetchPlaylists = async () => {
-			if (session) {
-				// const { data: playlists, error } = await getSongsInUserPlaylists(
-				//   session?.user?.id
-				// );
-				// console.log(playlists);
-				// if (error) {
-				//   console.error("Error fetching user playlists:", error);
-				//   return;
-				// }
-
-				// Fetch all playlists for the user
-				const { data: playlists, error: playlistsError } = await supabase
-					.from('playlists')
-					.select('*')
-					.eq('user_id', session?.user?.id)
-
-				if (playlistsError) {
-					console.error('Error fetching user playlists:', playlistsError)
-					return
-				}
-
-				setSpotPlaylists(playlists.filter((playlist) => playlist.platform === 'Spotify'))
-
-				setYtPlaylists(playlists.filter((playlist) => playlist.platform === 'Youtube'))
-
-				setScPlaylists(playlists.filter((playlist) => playlist.platform === 'Soundcloud'))
-
-				const songs = []
-
-				for (const playlist of playlists) {
-					const playlistSongs = await getSongsInPlaylist(playlist.id)
-					songs.push(playlistSongs)
-					if (playlist.platform === 'Spotify') {
-						updateSpotPlaylist(playlist.id, playlistSongs)
-					} else if (playlist.platform === 'Youtube') {
-						updateYtPlaylist(playlist.id, playlistSongs)
-					} else if (playlist.platform === 'Soundcloud') {
-						updateScPlaylist(playlist.id, playlistSongs)
-					}
-				}
-			}
-		}
-
-		fetchPlaylists()
-	}, [session])
-
-	async function getSongsInPlaylist(playlistId: string) {
-		try {
-			const { data: playlistSongs, error: playlistSongsError } = await supabase
-				.from('playlists_songs')
-				.select('song_id, song_order, yt') // Include 'yt' in the select
-				.eq('playlistId', playlistId)
-				.order('song_order', { ascending: true })
-
-			if (playlistSongsError) {
-				console.error('Error fetching songs in playlist:', playlistSongsError)
-				return
-			}
-
-			const songIds = playlistSongs.map((song) => song.song_id)
-
-			const { data: songs, error: songsError } = await supabase
-				.from('songs')
-				.select('*')
-				.in('id', songIds)
-
-			if (songsError) {
-				console.error('Error fetching song details:', songsError)
-				return
-			}
-
-			// Add 'yt' to each song
-			for (const song of songs) {
-				const playlistSong = playlistSongs.find((ps) => ps.song_id === song.id)
-				song.yt = playlistSong?.yt
-			}
-
-			songs.sort((a, b) => {
-				const orderA = playlistSongs.find((song) => song.song_id === a.id)?.song_order
-				const orderB = playlistSongs.find((song) => song.song_id === b.id)?.song_order
-				return (orderA ?? 0) - (orderB ?? 0)
-			})
-
-			return songs
-		} catch (error) {
-			console.error('Error fetching songs in playlist:', error)
-		}
-	}
 
 	return (
 		<View style={styles.container}>
@@ -196,91 +49,7 @@ export default function Profile() {
 					<Text style={{ ...styles.input, fontWeight: 'bold' }}>Link Spotify Account</Text>
 				</TouchableOpacity>
 				{/* </View> */}
-
-				<ProfilesList />
 			</ScrollView>
-		</View>
-	)
-}
-
-function ProfileView() {
-	const { spotProfile, ytProfile, scProfile } = useProfileStore()
-	const router = useRouter()
-
-	return (
-		<View>
-			{/* add three Buttons that display the user.image next to the user.username */}
-
-			<View
-				style={{
-					...styles.accountContainer,
-					backgroundColor: 'green',
-				}}
-			>
-				<TouchableOpacity onPress={() => router.navigate('/(tabs)/account/spotifyLogin')}>
-					<Text style={{ ...styles.input, fontWeight: 'bold' }}>Link Spotify Account</Text>
-				</TouchableOpacity>
-			</View>
-			<View
-				style={{
-					...styles.accountContainer,
-					backgroundColor: 'green',
-				}}
-			>
-				{/* Make it conditional if there is a spotProfile connnected aka spotProfile ? and else render a button to link spotify account */}
-
-				{spotProfile ? (
-					<>
-						{spotProfile?.image && (
-							<FastImage
-								source={{ uri: spotProfile?.image }}
-								style={{ width: 50, height: 50, borderRadius: 5 }}
-							/>
-						)}
-						<Text style={{ ...styles.input, fontWeight: 'bold' }}>{spotProfile?.username}</Text>
-					</>
-				) : (
-					<TouchableOpacity onPress={() => {}}>
-						<Text style={{ ...styles.input, fontWeight: 'bold' }}>Link Spotify Account</Text>
-					</TouchableOpacity>
-				)}
-
-				{/* {spotProfile?.image && (
-						<FastImage
-							source={{ uri: spotProfile?.image }}
-							style={{ width: 50, height: 50, borderRadius: 5 }}
-						/>
-					)}
-					<Text style={{ ...styles.input, fontWeight: 'bold' }}>{spotProfile?.username}</Text> */}
-			</View>
-			<Pressable
-				style={{
-					...styles.accountContainer,
-					backgroundColor: '#FF3131',
-				}}
-			>
-				{ytProfile?.image && (
-					<FastImage
-						source={{ uri: ytProfile?.image }}
-						style={{ width: 50, height: 50, borderRadius: 5 }}
-					/>
-				)}
-				<Text style={{ ...styles.input, fontWeight: 'bold' }}>{ytProfile?.username}</Text>
-			</Pressable>
-			<Pressable
-				style={{
-					...styles.accountContainer,
-					backgroundColor: '#FF6F00',
-				}}
-			>
-				{scProfile?.image && (
-					<FastImage
-						source={{ uri: scProfile?.image }}
-						style={{ width: 50, height: 50, borderRadius: 5 }}
-					/>
-				)}
-				<Text style={{ ...styles.input, fontWeight: 'bold' }}>{scProfile?.username}</Text>
-			</Pressable>
 		</View>
 	)
 }
