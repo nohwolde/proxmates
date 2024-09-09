@@ -5,11 +5,11 @@ import type { ExpoConfig } from '@expo/config'
 // }
 
 const defineConfig = (): ExpoConfig => ({
-	name: 'audyos',
-	slug: 'audyos',
+	name: 'proxmate',
+	slug: 'proxmate',
 	scheme: 'expo',
 	version: '1.0.0',
-	orientation: 'portrait',
+	orientation: 'default',
 	icon: './assets/icon.png',
 	userInterfaceStyle: 'dark',
 	splash: {
@@ -22,7 +22,7 @@ const defineConfig = (): ExpoConfig => ({
 	},
 	assetBundlePatterns: ['**/*'],
 	ios: {
-		bundleIdentifier: 'com.music.player',
+		bundleIdentifier: 'com.proxmate.app',
 		supportsTablet: true,
 		usesAppleSignIn: true,
 	},
@@ -32,10 +32,26 @@ const defineConfig = (): ExpoConfig => ({
 	},
 	extra: {
 		eas: {
-			projectId: '7dc3c550-2e3f-4fcf-ae2d-898f84f0f1cc',
+			projectId: 'dc912c96-9df5-4bfc-9b7b-bb131f79a4bd',
 		},
 	},
-	plugins: ['expo-apple-authentication', 'expo-video', 'expo-router'],
+	plugins: [
+		'expo-apple-authentication',
+		'expo-router',
+		'expo-sensors',
+		[
+			'@react-native-google-signin/google-signin',
+			{
+				iosUrlScheme: 'com.googleusercontent.apps.1074973696209-b83j1358l1rkpn9b82jiak0a5q366emb',
+			},
+		],
+		[
+			'expo-screen-orientation',
+			{
+				initialOrientation: 'ALL',
+			},
+		],
+	],
 	owner: 'nohwolde',
 })
 

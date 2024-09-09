@@ -4,25 +4,25 @@ import { defaultStyles } from '@/styles'
 import { Stack } from 'expo-router'
 import { View } from 'react-native'
 
-const AccountScreenLayout = () => {
+const HomeScreenLayout = () => {
 	return (
 		<View style={defaultStyles.container}>
 			<Stack>
 				<Stack.Screen
 					name="index"
 					options={{
-						headerTitle: 'Account',
-						headerBackVisible: true,
-						headerStyle: {
-							backgroundColor: '', // colors.background,
-						},
-						headerTintColor: '#141313',
 						...StackScreenWithSearchBar,
+						headerTitle: '🏠︎ Home',
+						// headerBackVisible: true,
+						// headerStyle: {
+						// 	backgroundColor: colors.background,
+						// },
+						// headerTintColor: colors.primary,
 					}}
 				/>
 
 				<Stack.Screen
-					name="login"
+					name="[id]"
 					options={{
 						headerTitle: '',
 						headerBackVisible: true,
@@ -37,4 +37,4 @@ const AccountScreenLayout = () => {
 	)
 }
 
-export default AccountScreenLayout
+export default HomeScreenLayout

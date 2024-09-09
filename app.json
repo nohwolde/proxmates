@@ -1,35 +1,52 @@
 {
 	"expo": {
-		"name": "music-player",
-		"slug": "music-player",
+		"name": "proxmate",
+		"slug": "proxmate",
 		"version": "1.0.0",
-		"orientation": "portrait",
+		"orientation": "default",
 		"icon": "./assets/icon.png",
 		"userInterfaceStyle": "dark",
 		"scheme": "music-player",
 		"splash": {
-			"image": "./assets/splash.png",
+			"image": "./assets/icon.png",
 			"resizeMode": "contain",
 			"backgroundColor": "#000"
 		},
 		"assetBundlePatterns": ["**/*"],
 		"ios": {
 			"supportsTablet": true,
-			"bundleIdentifier": "com.music.player",
+			"bundleIdentifier": "com.proxmate.app",
 			"infoPlist": {
 				"UIBackgroundModes": ["audio"]
 			}
 		},
 		"android": {
 			"adaptiveIcon": {
-				"foregroundImage": "./assets/adaptive-icon.png",
+				"foregroundImage": "./assets/icon.png",
 				"backgroundColor": "#000"
 			}
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
 		},
-		"plugins": ["expo-router", "expo-apple-authentication", "expo-video"],
+		"plugins": [
+			"expo-router",
+			"expo-av",
+			"expo-apple-authentication",
+			"expo-sensors",
+			[
+				"@react-native-google-signin/google-signin",
+				{
+					"iosUrlScheme": "com.googleusercontent.apps.1074973696209-b83j1358l1rkpn9b82jiak0a5q366emb"
+				}
+			],
+			[
+				"expo-screen-orientation",
+				{
+					"initialOrientation": "ALL"
+				}
+			]
+		],
 		"experiments": {
 			"typedRoutes": true,
 			"tsconfigPaths": true
